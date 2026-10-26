@@ -34,6 +34,19 @@ export type CreateCheckoutInput = {
   /** Opaque plan key defined by the consuming app (e.g. "pro"). */
   planKey: string;
   customerEmail?: string | null;
+  /**
+   * Existing provider customer id (`cus_...` for Stripe).
+   * When set, the adapter reuses it instead of searching or creating a customer.
+   * One customer may be shared by several accounts; the new subscription is
+   * still tagged with `accountId`.
+   */
+  providerCustomerId?: string | null;
+  /**
+   * Unix timestamp (seconds) when the checkout session should expire.
+   * Stripe allows 30 minutes to 24 hours from creation. Omitted by adapters
+   * that have no equivalent.
+   */
+  expiresAt?: number | null;
   successUrl: string;
   cancelUrl: string;
 };
@@ -48,7 +61,13 @@ export type CreatePortalInput = {
   returnUrl: string;
 };
 
-/** Normalized billing lifecycle events — adapters map PSP webhooks into these. */
+/**
+ * Normalized billing lifecycle events — adapters map PSP webhooks into these.
+ *
+ * `checkout.async_payment_failed` and `checkout.expired` were added in 0.2.0.
+ * Existing variants are unchanged. Handle the new discriminants or ignore them;
+ * a `switch` that assigns the remainder to `never` needs a new branch.
+ */
 export type BillingEvent =
   | {
       type: 'subscription.activated' | 'subscription.updated';
@@ -66,5 +85,13 @@ export type BillingEvent =
       type: 'invoice.payment_failed';
       accountId: string;
       invoiceId: string;
+      provider: PaymentProviderId;
+    }
+  | {
+      type: 'checkout.async_payment_failed' | 'checkout.expired';
+      accountId: string;
+      /** Checkout Session id (`cs_...` for Stripe). */
+      sessionId: string;
+      providerCustomerId?: string | null;
       provider: PaymentProviderId;
     };
