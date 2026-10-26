@@ -1,6 +1,6 @@
 {
   "name": "open-payment-adapter",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Open payment provider port for SaaS billing (multi-PSP adapters)",
   "type": "module",
   "main": "./dist/index.js",
@@ -18,6 +18,7 @@
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "scripts": {

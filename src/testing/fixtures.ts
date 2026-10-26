@@ -206,11 +206,13 @@ export const chargebeeSubscriptionCancelledFixture: ProviderWebhookFixture = {
  * Stripe `checkout.session.completed` object only.
  * Wrap in a Stripe.Event in tests. Omit `subscription` so mappers can resolve
  * planKey from metadata without calling stripe.subscriptions.retrieve.
+ * `payment_status` is `paid` — `unpaid` sessions do not activate.
  */
 export const stripeCheckoutSessionCompletedObject = {
   id: 'cs_test_1',
   object: 'checkout.session',
   mode: 'subscription',
+  payment_status: 'paid',
   client_reference_id: FIXTURE_ACCOUNT_ID,
   // Keep null so unit tests do not need a live/mocked Stripe SDK client.
   customer: null,
